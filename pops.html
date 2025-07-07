@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦幻泡泡屏幕保护程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            animation: infinite;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #a8edea, #fed6e3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .controls {
+            align-content: end;
+            text-shadow: #0f0c29;
+            display: flex;
+            gap: 20px;
+            align-items: end;
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgb(186, 253, 255);
+            text-shadow:
+                #000000 0px 3px 5px,
+                #000000 0px 3px 5px,
+                #000000 0px 3px 5px,
+                #000000 0px 1px 2px,
+                #0f0c29 0px 3px 5px;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow:
+                #000000 0px 3px 5px,
+                #000000 0px 3px 5px,
+                #000000 0px 3px 5px,
+                #000000 0px 1px 2px,
+                #0f0c29 0px 3px 5px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 0px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        bus {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bubbleCanvas"></canvas>
+
+    <div class="container">
+        <!--         <header>
+            <h1>梦幻泡泡屏幕保护程序</h1>
+            <p class="subtitle">动态泡泡效果，泡泡会随机生成、漂浮、碰撞并消失。可自定义。</p>
+        </header> -->
+
+        <div class="container">
+
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="bubbleCount">泡泡数量</label>
+                <input type="range" id="bubbleCount" min="10" max="65535" value="80">
+            </div>
+
+            <div class="control-group">
+                <label for="bubbleSize">泡泡大小</label>
+                <input type="range" id="bubbleSize" min="10" max="1024" value="40">
+            </div>
+
+            <div class="control-group">
+                <label for="bubbleSpeed">移动速度</label>
+                <input type="range" id="bubbleSpeed" min="0.5" max="60" step="0.1" value="1.5">
+            </div>
+
+            <button id="resetBtn" class="btn">重置泡泡</button>
+        </div>
+
+        <div class="info-panel">
+            当前泡泡: <span id="bubbleCountDisplay">80</span> |
+            大小: <span id="bubbleSizeDisplay">40</span>px |
+            速度: <span id="bubbleSpeedDisplay">1.5</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bubbleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 设置Canvas大小为窗口大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 泡泡类
+        class Bubble {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.radius = Math.random() * 30 + 20;
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + this.radius;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = -(Math.random() * 2 + 1);
+                this.color = this.getRandomColor();
+                this.alpha = Math.random() * 0.5 + 0.3;
+                this.life = Math.random() * 200 + 100;
+            }
+
+            getRandomColor() {
+                const colors = [
+                    'rgba(173, 216, 230, ALPHA)',   // 浅蓝色
+                    'rgba(135, 206, 250, ALPHA)',   // 天蓝色
+                    'rgba(240, 128, 128, ALPHA)',   // 浅红色
+                    'rgba(152, 251, 152, ALPHA)',   // 浅绿色
+                    'rgba(221, 160, 221, ALPHA)',   // 浅紫色
+                    'rgba(255, 228, 196, ALPHA)',   // 米色
+                    'rgba(255, 255, 224, ALPHA)'    // 浅黄色
+                ];
+                return colors[Math.floor(Math.random() * colors.length)].replace('ALPHA', this.alpha);
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life--;
+
+                // 添加一些随机运动
+                if (Math.random() > 0.95) {
+                    this.speedX += (Math.random() - 0.5) * 0.5;
+                    this.speedY += (Math.random() - 0.5) * 0.5;
+                }
+
+                // 边界检查
+                if (this.x < this.radius) {
+                    this.x = this.radius;
+                    this.speedX *= -0.8;
+                }
+                if (this.x > canvas.width - this.radius) {
+                    this.x = canvas.width - this.radius;
+                    this.speedX *= -0.8;
+                }
+
+                // 如果泡泡离开屏幕顶部或生命周期结束，重置它
+                if (this.y < -this.radius || this.life <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // 添加高光效果
+                ctx.beginPath();
+                ctx.arc(
+                    this.x - this.radius * 0.3,
+                    this.y - this.radius * 0.3,
+                    this.radius * 0.2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.8})`;
+                ctx.fill();
+            }
+        }
+
+        // 创建泡泡数组
+        let bubbles = [];
+        const bubbleCount = 80;
+
+        // 初始化泡泡
+        function initBubbles(count) {
+            bubbles = [];
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    bubbles.push(new Bubble());
+                }, i * 100);
+            }
+        }
+
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制半透明背景层
+            ctx.fillStyle = 'rgba(15, 12, 41, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 更新和绘制所有泡泡
+            bubbles.forEach(bubble => {
+                bubble.update();
+                bubble.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // 初始化
+        initBubbles(bubbleCount);
+        animate();
+
+        // 控制面板交互
+        const bubbleCountSlider = document.getElementById('bubbleCount');
+        const bubbleSizeSlider = document.getElementById('bubbleSize');
+        const bubbleSpeedSlider = document.getElementById('bubbleSpeed');
+        const resetBtn = document.getElementById('resetBtn');
+
+        const bubbleCountDisplay = document.getElementById('bubbleCountDisplay');
+        const bubbleSizeDisplay = document.getElementById('bubbleSizeDisplay');
+        const bubbleSpeedDisplay = document.getElementById('bubbleSpeedDisplay');
+
+        // 更新泡泡数量
+        bubbleCountSlider.addEventListener('input', function () {
+            const count = parseInt(this.value);
+            bubbleCountDisplay.textContent = count;
+            initBubbles(count);
+        });
+
+        // 更新泡泡大小
+        bubbleSizeSlider.addEventListener('input', function () {
+            const size = parseInt(this.value);
+            bubbleSizeDisplay.textContent = size;
+            bubbles.forEach(bubble => {
+                bubble.radius = Math.random() * (size / 2) + (size / 2);
+            });
+        });
+
+        // 更新泡泡速度
+        bubbleSpeedSlider.addEventListener('input', function () {
+            const speed = parseFloat(this.value);
+            bubbleSpeedDisplay.textContent = speed;
+            bubbles.forEach(bubble => {
+                bubble.speedX = (Math.random() - 0.5) * 2 * (speed / 1.5);
+                bubble.speedY = -(Math.random() * 2 + 1) * (speed / 1.5);
+            });
+        });
+
+        // 重置按钮
+        resetBtn.addEventListener('click', function () {
+            initBubbles(parseInt(bubbleCountSlider.value));
+        });
+
+        // 添加鼠标移动效果
+        canvas.addEventListener('mousemove', function (e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            bubbles.forEach(bubble => {
+                const dx = bubble.x - mouseX;
+                const dy = bubble.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 150) {
+                    const force = (150 - distance) / 50;
+                    bubble.speedX += dx * 0.01 * force;
+                    bubble.speedY += dy * 0.01 * force;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
